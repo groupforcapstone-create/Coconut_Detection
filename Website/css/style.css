@@ -1,0 +1,252 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*Code Starts Here */
+
+@font-face {
+	font-family:Playfair ;
+	src: url(../fonts/PlayfairDisplay-Bold.ttf);
+}
+@font-face {
+	font-family: Roboto;
+	src: url(../fonts/Roboto-Bold.ttf);
+}
+
+/* Navigation */
+
+nav {
+    padding: 0px 100px;
+    background-color: #2b2016;
+    display: flex;
+    align-items: center;
+	justify-content: space-between;
+}
+
+nav img {
+    width: 75px;
+
+}
+
+nav ul {
+    display: flex;
+	justify-content: center;
+}
+
+nav ul li a {
+    padding: 30px 10px;
+	justify-content: center;
+	color: white;
+}
+nav ul a img{
+	filter: invert(100%);
+	margin-left: auto;
+	justify-content: right;
+	width: 15px;
+}
+
+
+/* Home */
+
+#Home{
+	background-image: url(../images/banner.png_100521.png);
+    height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+	color: white;
+}
+.right{
+	padding-top: 300px;
+	height: 300px;
+	width: 56%;
+	float: right;
+
+}
+.right h1{
+	font-size: 70px;
+}
+.right h3{
+	font-size: 17px;
+	width: 500px;
+}
+.View-Menu{
+	margin-top: 10px;
+	font-family: Roboto;
+	background-color: #f39c19;
+	height: 45px;
+	width: 300px;
+	font-size: 20px;
+	text-align: center;
+	color: white;
+}
+
+/* Floating box */
+
+.floating-box{
+	background-color: aliceblue;
+	height: 100px;
+	width: 770px;
+	justify-content: center;
+	float:left;
+	margin-left: 20%;
+	padding: 5px;
+}
+.floating-box img{
+	width: 150px;
+	height: 100px;
+}
+
+/* Menu */
+.Menu{
+	margin-top: 40px;
+	height: 45px;
+	width: 300px;
+	font-size: 20px;
+	text-align: center;
+	color: white;
+	margin-top: 10px;
+
+}
+article h1{
+	font-family: Playfair;
+	text-align: center;
+	color: #000000;
+	padding: 20px;
+	font-size: 20px;
+}
+article h3{
+	font-family: Roboto;
+	text-align: center;
+	color: #f39c19;
+	padding-top: 150px;
+	font-size: 20px;
+}
+/*Left Menu*/
+
+.left-menu{
+	height: 280px;
+	width: 515px;
+	margin-left: 150px	;
+	float: left;
+
+}
+.list{
+	background-color: #2b2016;
+	margin: 10px 10px;
+	height: 80px;
+}
+
+/* Right Menu*/
+
+.right-menu{
+	height: 280px;
+	width: 515px;
+	margin-right: 150px	;
+	float: right;
+
+}
+/*Footer*/
+
+footer{
+	margin-top: 300px;
+	background-color: #15100b;
+	color: white;
+	height: 430px;
+	justify-content: space-between;
+	display: flex;
+}
+.Contact{	
+	background-color: #15100b;
+	height: 150px;
+	width: 300px;
+	margin-left: 150px;
+	padding-top: 40px;
+	margin-right: 2px;
+}
+.Contact h1{
+	padding: 10px 10px;
+}
+.Contact h3{
+	padding: 10px 10px;
+	font-size: 12px;
+}
+
+.Our-Links{
+	height: 150px;
+	width: 200px;
+	margin-top: 40px;
+	margin-right: 100px;
+	padding: 10px 10px;
+	color: white;
+}
+.Our-Links ul li a{
+	padding: 10px 10px;
+	color: white;
+}
+.Gallery{
+	height: 300px;
+	width: 450px;
+	margin-top: 40px ;
+	margin-right: 100px;
+	color: white;
+	justify-content: end;
+}
+.Gallery h1{
+	color: white;
+	padding:10px 0px;
+}
+.container{
+	display: grid;
+  	grid-template-columns: repeat(3, 100px);
+  	grid-template-rows: repeat(3, 100px);
+  	gap: 10px;
+}
+.box{
+	background-color: aqua;
+} 
