@@ -26,6 +26,10 @@ dependencies:
   # UI icons
   cupertino_icons: ^1.0.8
 
+  # Modern TensorFlow Lite Engine
+  tflite_flutter: ^0.10.4
+
+
   # Camera support
   camera: ^0.10.6
 
@@ -36,7 +40,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0  # Kept compatible with SDK 3.x
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
 
@@ -71,3 +75,5 @@ flutter:
   uses-material-design: true
   assets:
     - logo.jpg
+    - assets/models/coconut_variety_model.tflite
+    - assets/models/coconut_labels.txt
