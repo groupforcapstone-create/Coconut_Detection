@@ -1,8 +1,13 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'theme/app_theme.dart';
 
 // Import screens
 import 'screens/camera_page.dart';
+import 'screens/history_page.dart';
 import 'screens/settings_page.dart' as settings;
 
 // --- 1. SSL HANDSHAKE FIX (Essential for local/private servers) ---
@@ -15,37 +20,49 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode = prefs.getBool('app_dark_mode') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Coconut Detection',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
-          brightness: Brightness.light,
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF5F7F6),
-      ),
+      theme: _isDarkMode ? AppTheme.dark() : AppTheme.light(),
       home: const HomeTabs(),
     );
   }
 }
 
-// --- 2. MAIN NAVIGATION & SERVER WAKE-UP ---
 class HomeTabs extends StatefulWidget {
   final int initialIndex;
-  const HomeTabs({super.key, this.initialIndex = 0});
+  const HomeTabs({super.key, this.initialIndex = 1});
 
   @override
   State<HomeTabs> createState() => _HomeTabsState();
@@ -60,6 +77,16 @@ class _HomeTabsState extends State<HomeTabs> {
   }
 
   void _onItemTapped(int index) {
+    // If user taps the camera tab while it's already selected,
+    // force a refresh of that tab by rebuilding it.
+    if (_selectedIndex == index) {
+      setState(() {
+        // A different key causes IndexedStack child to rebuild.
+        _selectedIndex = index;
+      });
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
@@ -71,9 +98,9 @@ class _HomeTabsState extends State<HomeTabs> {
       extendBody: true,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Coconut Detection',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w800,
             fontSize: 18,
@@ -86,6 +113,7 @@ class _HomeTabsState extends State<HomeTabs> {
       body: IndexedStack(
         index: _selectedIndex,
         children: const [
+          HistoryPage(),
           CameraPage(),
           settings.SettingsPage(),
         ],
@@ -97,51 +125,146 @@ class _HomeTabsState extends State<HomeTabs> {
   Widget _buildFloatingNavbar() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        child: Container(
-          height: 72,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
-            ),
-            borderRadius: BorderRadius.circular(35),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 15,
-                offset: const Offset(0, 8),
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        child: SizedBox(
+          height: 86,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                height: 68,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+                  ),
+                  borderRadius: BorderRadius.circular(34),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.22),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _navItem(
+                        index: 0,
+                        icon: Icons.history_rounded,
+                        label: 'History',
+                      ),
+                    ),
+                    const SizedBox(width: 82),
+                    Expanded(
+                      child: _navItem(
+                        index: 2,
+                        icon: Icons.settings_rounded,
+                        label: 'Settings',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 0,
+                child: _cameraNavIcon(_selectedIndex == 1),
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(35),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white.withValues(alpha: 0.5),
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              iconSize: 22,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.camera_alt_outlined),
-                  activeIcon: Icon(Icons.camera_alt),
-                  label: 'Scanner',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings_outlined),
-                  activeIcon: Icon(Icons.settings),
-                  label: 'Settings',
-                ),
-              ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
+    final selected = _selectedIndex == index;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(34),
+      onTap: () => _onItemTapped(index),
+      child: SizedBox(
+        height: 68,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color:
+                  selected ? Colors.white : Colors.white.withValues(alpha: 0.6),
+              size: 25,
             ),
-          ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: selected
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.6),
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cameraNavIcon(bool selected) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(38),
+      onTap: () => _onItemTapped(1),
+      child: SizedBox(
+        width: 78,
+        height: 78,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                color: selected ? Colors.white : const Color(0xFFE8F5E9),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF2E7D32),
+                  width: 4,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 14,
+                    offset: const Offset(0, 7),
+                  ),
+                ],
+              ),
+              child: Icon(
+                selected ? Icons.camera_alt : Icons.camera_alt_outlined,
+                color: const Color(0xFF2E7D32),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'Camera',
+              maxLines: 1,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
         ),
       ),
     );

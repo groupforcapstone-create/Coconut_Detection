@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   image: ^4.0.17
-  
+
   flutter_image_compress: ^2.3.0
   path_provider: ^2.1.2 
 
@@ -27,8 +27,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Modern TensorFlow Lite Engine
-  tflite_flutter: ^0.10.4
-
+  tflite_flutter: ^0.12.1
 
   # Camera support
   camera: ^0.10.6
@@ -75,5 +74,5 @@ flutter:
   uses-material-design: true
   assets:
     - logo.jpg
-    - assets/models/coconut_variety_model.tflite
+    - assets/models/coconut_model2.tflite
     - assets/models/coconut_labels.txt

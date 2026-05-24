@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'coconut_about_page.dart';
+import 'about_settings_page.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -9,8 +12,68 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _notificationsEnabled = true;
+  bool _isDarkMode = false;
   String _language = 'English';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode = prefs.getBool('app_dark_mode') ?? false;
+      _language = prefs.getString('app_language') ?? 'English';
+    });
+  }
+
+  Future<void> _setDarkMode(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('app_dark_mode', value);
+
+    setState(() => _isDarkMode = value);
+
+    // Theme is applied by MyApp using persisted preference.
+    // Note: if immediate update is needed, we can refactor to use a theme provider/state manager.
+  }
+
+  Future<void> _selectLanguage() async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Select Language'),
+        children: ['English', 'Tagalog']
+            .map(
+              (l) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, l),
+                child: Text(l),
+              ),
+            )
+            .toList(),
+      ),
+    );
+
+    if (selected == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('app_language', selected);
+
+    setState(() => _language = selected);
+  }
+
+  void _openAbout() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CoconutAboutPage()),
+    );
+  }
+
+  void _openAboutSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AboutSettingsPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +95,14 @@ class _SettingsPageState extends State<SettingsPage> {
             _sectionHeader('PREFERENCES'),
             const SizedBox(height: 12),
             _buildPreferenceTile(
-              icon: Icons.notifications_none_rounded,
-              title: 'Push Notifications',
+              icon: Icons.dark_mode_rounded,
+              title: 'Light / Dark Mode',
+              subtitle: _isDarkMode ? 'Dark' : 'Light',
               trailing: Switch(
-                value: _notificationsEnabled,
+                value: _isDarkMode,
                 activeTrackColor: const Color(0xFF1B5E20),
                 activeThumbColor: Colors.white,
-                onChanged: (val) => setState(() => _notificationsEnabled = val),
+                onChanged: _setDarkMode,
               ),
             ),
             _buildPreferenceTile(
@@ -51,13 +115,17 @@ class _SettingsPageState extends State<SettingsPage> {
             _sectionHeader('SYSTEM'),
             const SizedBox(height: 12),
             _buildPreferenceTile(
+              icon: Icons.settings_rounded,
+              title: 'Settings Overview',
+              subtitle: 'How to use the options',
+              onTap: _openAboutSettings,
+            ),
+            _buildPreferenceTile(
               icon: Icons.info_outline_rounded,
               title: 'About Coconut Detection',
               subtitle: 'Version 1.0.0',
-              onTap: _showAbout,
+              onTap: _openAbout,
             ),
-            const SizedBox(height: 40),
-            _buildLogoutButton(),
           ],
         ),
       ),
@@ -65,20 +133,24 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _sectionHeader(String title) {
-    return Text(title,
-        style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w900,
-            color: Colors.grey[500],
-            letterSpacing: 1.2));
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w900,
+        color: Colors.grey[500],
+        letterSpacing: 1.2,
+      ),
+    );
   }
 
-  Widget _buildPreferenceTile(
-      {required IconData icon,
-      required String title,
-      String? subtitle,
-      Widget? trailing,
-      VoidCallback? onTap}) {
+  Widget _buildPreferenceTile({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -89,56 +161,18 @@ class _SettingsPageState extends State<SettingsPage> {
       child: ListTile(
         onTap: onTap,
         leading: Icon(icon, color: const Color(0xFF1B5E20)),
-        title: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
         subtitle: subtitle != null ? Text(subtitle) : null,
         trailing: trailing ??
-            const Icon(Icons.chevron_right_rounded,
-                color: Colors.grey, size: 20),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey,
+              size: 20,
+            ),
       ),
     );
-  }
-
-  Widget _buildLogoutButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: TextButton(
-        onPressed: _logout,
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: Colors.red.withValues(alpha: 0.05),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
-        child: const Text('Logout',
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  void _selectLanguage() async {
-    final selected = await showDialog<String>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Select Language'),
-        children: ['English', 'Tagalog']
-            .map((l) => SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, l), child: Text(l)))
-            .toList(),
-      ),
-    );
-    if (selected != null) setState(() => _language = selected);
-  }
-
-  void _showAbout() => showAboutDialog(
-      context: context,
-      applicationName: 'Coconut Detection',
-      applicationVersion: '1.0.0');
-
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (!mounted) return;
-    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 }

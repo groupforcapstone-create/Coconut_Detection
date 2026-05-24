@@ -15,7 +15,7 @@ class _CameraInstructionPageState extends State<CameraInstructionPage> {
     final title = _useEnglish ? 'Scan Guide' : 'Gabay sa Pag-scan';
     final message = _useEnglish
         ? 'Point the camera at the seedling, keep it inside the frame, and tap the scan button.'
-        : 'Itutok ang camera sa punla, siguraduhing nasa frame, at pindutin ang scan button.';
+        : 'Itutok ang camera sa punla, siguraduhing nasa loob ng frame, at pindutin ang scan button.';
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -23,32 +23,41 @@ class _CameraInstructionPageState extends State<CameraInstructionPage> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.88),
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.white.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 16,
-              offset: const Offset(0, 8),
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.camera_alt_outlined,
-                size: 40, color: Color(0xFF2E7D32)),
+            const Icon(
+              Icons.camera_alt_outlined,
+              size: 42,
+              color: Color(0xFF2E7D32),
+            ),
             const SizedBox(height: 12),
-            Text(title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
+                color: Color(0xFF1B5E20),
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
-                height: 1.4,
+                height: 1.45,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF2E2E2E),
               ),
@@ -72,8 +81,10 @@ class _CameraInstructionPageState extends State<CameraInstructionPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2E7D32),
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 26, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 26,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
